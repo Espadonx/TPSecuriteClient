@@ -19,11 +19,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Base64;
 import java.util.Scanner;
 
 public class Requester {
 
-    public static void main(String args[]) throws IOException {
+    public static void main(String args[]) throws IOException, Exception {
 
         //Récupération des entrées utilisateurs
         Scanner sc = new Scanner(System.in);
@@ -35,32 +36,52 @@ public class Requester {
         int port = sc.nextInt();
         
         
-        Socket s1 = null;
+        Socket socket = null;
         String line = null;
         BufferedReader br = null;
         BufferedReader is = null;
         PrintWriter os = null;
 
         try {
-            s1 = new Socket(address, port); // You can use static final constant PORT_NUM
+            socket = new Socket(address, port); // You can use static final constant PORT_NUM
             br = new BufferedReader(new InputStreamReader(System.in));
-            is = new BufferedReader(new InputStreamReader(s1.getInputStream()));
-            os = new PrintWriter(s1.getOutputStream());
+            is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            os = new PrintWriter(socket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
             System.err.print("IO Exception");
         }
-
-        System.out.println("Client Address : " + address);
+        
+        System.out.println("Server Address : " + address);
         System.out.println("Enter Data to echo Server ( Enter QUIT to end):");
+        
+        //On créé la clé SYMETRIQUE
+        SymetricEncryption se = new SymetricEncryption();
+        AssymetricEncryption ae = new AssymetricEncryption();
+        se.generateKey(); //Génération de la clé
+        String k = se.getStringKey();
+        
+        //On établit la connexion avant de laisser le libre arbitre à l'utilisateur
+       String messageToEncrypt = "Fabien|"+k;
+       
+       //chiffre avec la clé privé
+       String messageChiffre = ae.encrypt(Base64.getEncoder().encodeToString(messageToEncrypt.getBytes()));
+       
+        System.out.println(messageChiffre);
+       
+            os.println(messageChiffre);
+            os.flush();
+            System.out.println("RéponseCrypted : "+is.readLine());
+            System.out.println("rep decrypted : "+se.getStringDecrypt(is.readLine().getBytes()));
+            //Attente de la réponse du serveur
 
         String response = null;
         try {
             line = br.readLine();
-            while (line.compareTo("QUIT") != 0) {
+            while (line.compareTo("QUIT") != 0) { 
                 os.println(line);
-                if(s1.isConnected()){
-                    System.out.println(s1.getRemoteSocketAddress());
+                if(socket.isConnected()){
+                    System.out.println(socket.getRemoteSocketAddress());
                 }
                 os.flush();
                 response = is.readLine();
@@ -77,7 +98,7 @@ public class Requester {
             is.close();
             os.close();
             br.close();
-            s1.close();
+            socket.close();
             System.out.println("Connection Closed");
 
         }
