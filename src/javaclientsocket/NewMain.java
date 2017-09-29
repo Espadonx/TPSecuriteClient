@@ -20,12 +20,17 @@ public class NewMain {
      */
     public static void main(String[] args) throws UnsupportedEncodingException {
         // TODO code application logic here
-        cryptage c = new cryptage();
-        c.createFile(c.getKey());
+        SymetricEncryption c = new SymetricEncryption();
+        c.createFileKey();
         
-        byte[] result = c.crypt("Xavier");
+        System.out.println("Clé actuelle : "+c.getStringKey());
         
-        System.out.println(c.getStringCrypt("Xavier"));
+        String cleActuelle = c.getStringKey();
+        
+        //Reconstruction de la clé
+        c.constructKey(cleActuelle);
+        
+        System.out.println("New Clé : "+c.getStringKey());
         
     }
     

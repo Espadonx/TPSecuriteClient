@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  *
@@ -30,14 +31,14 @@ public class SymetricEncryption {
     SecretKey key;
 
     public SymetricEncryption() {
-        this.key = getKey();
+
     }
 
-    public SecretKey getKey() {
+    public SecretKey generateKey() {
         SecretKey k = null;
         try {
             KeyGenerator kg = KeyGenerator.getInstance("DES");
-             k = kg.generateKey();
+            k = kg.generateKey();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -67,27 +68,41 @@ public class SymetricEncryption {
         }
         return crypted;
     }
-    
-    public String getStringDecrypt(byte[] stream){
+
+    public String getStringDecrypt(byte[] stream) {
         return new String(this.decrypt(stream));
     }
-    
-    public String getStringCrypt(String stream){
+
+    public String getStringCrypt(String stream) {
         return new String(this.crypt(stream));
     }
 
-    public boolean createFile(SecretKey k) throws UnsupportedEncodingException {
+    public String getStringKey() {
+        if (this.key == null) {
+            this.key = generateKey();
+        }
+        String s = Base64.getEncoder().encodeToString(this.key.getEncoded());
+        return s;
+    }
+
+    public boolean createFileKey() throws UnsupportedEncodingException {
         PrintWriter writer;
+        if (this.key == null) {
+            this.key = generateKey();
+        }
         try {
             writer = new PrintWriter("C:/Users/Fabien-portable/Desktop/symetric_key.txt");
-            //String keyencoded = Base64.getEncoder().encodeToString(k.getEncoded());
-            String keyencoded = new String(k.getEncoded(), "Windows-1252");
-            writer.write(keyencoded);
+            writer.write(this.getStringKey());
             writer.close();
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(cryptage.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
         return (new File("C:/Users/Fabien-portable/Desktop/symetric_key.txt")).exists();
+    }
+    
+    public void constructKey(String stream){
+        byte[] decodedKey = Base64.getDecoder().decode(stream);
+        this.key = new SecretKeySpec(decodedKey, 0, decodedKey.length, "DES");
     }
 
 }
