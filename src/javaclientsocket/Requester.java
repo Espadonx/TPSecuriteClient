@@ -36,6 +36,7 @@ public class Requester {
         int port = sc.nextInt();
 
         Socket socket = null;
+        String lineCrypted = null;
         String line = null;
         BufferedReader br = null;
         BufferedReader is = null;
@@ -58,9 +59,10 @@ public class Requester {
         //On établit la connexion avant de laisser le libre arbitre à l'utilisateur
         AssymetricEncryption ae = new AssymetricEncryption("pub_serveur.txt", "priv_client.txt");
         String messageToEncrypt = "client";
+        
+        //On génère la clé DH partagée avec le serveur
         DHEncryption dhe = new DHEncryption();
         String keyShared = Base64.getEncoder().encodeToString(dhe.generateCommonSecretKey(ae.getGlobal_privateKey(), ae.getGlobal_publicKey()));
-        
         System.out.println("key : "+keyShared);
         
 
@@ -71,8 +73,12 @@ public class Requester {
 
         String response = null;
         try {
-            line = br.readLine();
+            lineCrypted = br.readLine();
+            
+            //On décripte le message
+            line = DHEncryption.encryptMessage(keyShared.getBytes(), lineCrypted);
             while (line.compareTo("QUIT") != 0) {
+                
                 os.println(line);
                 if (socket.isConnected()) {
                     System.out.println(socket.getRemoteSocketAddress());
