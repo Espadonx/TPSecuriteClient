@@ -58,13 +58,13 @@ public class Requester {
         //On établit la connexion avant de laisser le libre arbitre à l'utilisateur
         AssymetricEncryption ae = new AssymetricEncryption("pub_serveur.txt", "priv_client.txt");
         String messageToEncrypt = "client";
-
-        //chiffre avec la clé privé
-        String messageChiffre = ae.encrypt(messageToEncrypt);
+        DHEncryption dhe = new DHEncryption();
+        String keyShared = Base64.getEncoder().encodeToString(dhe.generateCommonSecretKey(ae.getGlobal_privateKey(), ae.getGlobal_publicKey()));
         
-        System.out.println(messageChiffre);
+        System.out.println("key : "+keyShared);
+        
 
-        os.println(messageChiffre);
+        //os.println(messageChiffre);
         os.flush();
         System.out.println("RéponseCrypted : " + is.readLine());
         //Attente de la réponse du serveur

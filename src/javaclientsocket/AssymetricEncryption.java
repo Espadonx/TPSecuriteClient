@@ -17,6 +17,7 @@ import java.util.Base64;
 import java.util.List;
 
 import javax.crypto.Cipher;
+import javax.xml.bind.DatatypeConverter;
 
 public class AssymetricEncryption {
 
@@ -82,7 +83,7 @@ public class AssymetricEncryption {
 
     public String encrypt(String inputData)
             throws Exception {
-        byte[] r = encrypt(global_publicKey, Base64.getDecoder().decode(inputData));
+        byte[] r = encrypt(global_publicKey, DatatypeConverter.parseBase64Binary(inputData));
 
         return new String(r);
     }
@@ -109,7 +110,7 @@ public class AssymetricEncryption {
 
     public String decrypt(String inputData)
             throws Exception {
-        byte[] r = decrypt(global_publicKey, Base64.getDecoder().decode(inputData));
+        byte[] r = decrypt(global_publicKey, DatatypeConverter.parseBase64Binary(inputData));
         String re = new String(r);
 
         return re;
