@@ -18,9 +18,9 @@ public class NewMain {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws UnsupportedEncodingException {
+    public static void main(String[] args) throws UnsupportedEncodingException, Exception {
         // TODO code application logic here
-        SymetricEncryption c = new SymetricEncryption();
+        /*SymetricEncryption c = new SymetricEncryption();
         c.createFileKey();
         
         System.out.println("Clé actuelle : "+c.getStringKey());
@@ -30,7 +30,11 @@ public class NewMain {
         //Reconstruction de la clé
         c.constructKey(cleActuelle);
         
-        System.out.println("New Clé : "+c.getStringKey());
+        System.out.println("New Clé : "+c.getStringKey());*/
+        
+        DHEncryption obj = new DHEncryption();
+        //AssymetricEncryption ae = new AssymetricEncryption();
+        //byte[] b = obj.generateCommonSecretKey(ae.getGlobal_privateKey(), ae.getGlobal_publicKey());
         
     }
     

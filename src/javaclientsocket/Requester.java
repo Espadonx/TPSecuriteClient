@@ -31,11 +31,10 @@ public class Requester {
         System.out.println("Saisissez l'adresse IP du serveur :");
         //String address = "192.168.43.209";
         String address = sc.nextLine();
-        
+
         System.out.println("Saisissez maintenant le PORT :");
         int port = sc.nextInt();
-        
-        
+
         Socket socket = null;
         String line = null;
         BufferedReader br = null;
@@ -51,43 +50,38 @@ public class Requester {
             e.printStackTrace();
             System.err.print("IO Exception");
         }
-        
+
         System.out.println("Server Address : " + address);
         System.out.println("Enter Data to echo Server ( Enter QUIT to end):");
-        
+
         //On créé la clé SYMETRIQUE
-        SymetricEncryption se = new SymetricEncryption();
-        AssymetricEncryption ae = new AssymetricEncryption();
-        se.generateKey(); //Génération de la clé
-        String k = se.getStringKey();
-        
         //On établit la connexion avant de laisser le libre arbitre à l'utilisateur
-       String messageToEncrypt = "Fabien|"+k;
-       
-       //chiffre avec la clé privé
-       String messageChiffre = ae.encrypt(Base64.getEncoder().encodeToString(messageToEncrypt.getBytes()));
-       
+        AssymetricEncryption ae = new AssymetricEncryption("pub_serveur.txt", "priv_client.txt");
+        String messageToEncrypt = "client";
+
+        //chiffre avec la clé privé
+        String messageChiffre = ae.encrypt(messageToEncrypt);
+        
         System.out.println(messageChiffre);
-       
-            os.println(messageChiffre);
-            os.flush();
-            System.out.println("RéponseCrypted : "+is.readLine());
-            System.out.println("rep decrypted : "+se.getStringDecrypt(is.readLine().getBytes()));
-            //Attente de la réponse du serveur
+
+        os.println(messageChiffre);
+        os.flush();
+        System.out.println("RéponseCrypted : " + is.readLine());
+        //Attente de la réponse du serveur
 
         String response = null;
         try {
             line = br.readLine();
-            while (line.compareTo("QUIT") != 0) { 
+            while (line.compareTo("QUIT") != 0) {
                 os.println(line);
-                if(socket.isConnected()){
+                if (socket.isConnected()) {
                     System.out.println(socket.getRemoteSocketAddress());
                 }
                 os.flush();
                 response = is.readLine();
                 System.out.println("Server Response : " + response);
                 line = br.readLine();
-                
+
             }
 
         } catch (IOException e) {
